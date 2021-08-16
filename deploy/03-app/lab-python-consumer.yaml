@@ -1,8 +1,15 @@
 ---
 apiVersion: v1
+kind: Namespace
+metadata:
+  name: app
+
+---
+apiVersion: v1
 kind: Service
 metadata:
   name: lab-python-consumer-svc
+  namespace: app
 spec:
   selector:
     app: lab-python-consumer
@@ -17,6 +24,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: lab-python-consumer
+  namespace: app
 spec:
   selector:
     matchLabels:
@@ -33,4 +41,3 @@ spec:
         imagePullPolicy: Always
         ports:
         - containerPort: 5000
-
