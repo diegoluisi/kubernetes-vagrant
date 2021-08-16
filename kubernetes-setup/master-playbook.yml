@@ -12,38 +12,19 @@
       - apt-transport-https
       - ca-certificates
       - curl
-      - gnupg-agent
-      - software-properties-common
+      - software-properties-common 
+      - gnupg2
 
-  - name: Add an apt signing key for Docker
-    apt_key:
-      url: https://download.docker.com/linux/ubuntu/gpg
-      state: present
-
-  - name: Add apt repository for stable version
-    apt_repository:
-      repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu xenial stable
-      state: present
-
-  - name: Install docker and its dependecies
+  - name: Install containerd
     apt: 
       name: "{{ packages }}"
       state: present
       update_cache: yes
     vars:
       packages:
-      - docker-ce 
-      - docker-ce-cli 
-      - containerd.io
-    notify:
-      - docker status
+      - containerd
 
-  - name: Add vagrant user to docker group
-    user:
-      name: vagrant
-      group: docker
-
- - name: Remove swapfile from /etc/fstab
+  - name: Remove swapfile from /etc/fstab
     mount:
       name: "{{ item }}"
       fstype: swap
@@ -74,44 +55,116 @@
       update_cache: yes
     vars:
       packages:
-        - kubelet 
-        - kubeadm 
-        - kubectl
+        - kubelet=1.21.0-00
+        - kubeadm=1.21.0-00
+        - kubectl=1.21.0-00
 
-  - name: Configure node ip
+  - name: Configure containerd
+    blockinfile:
+      create: true
+      path: /etc/modules-load.d/containerd.conf
+      block: |
+        overlay
+        br_netfilter
+
+  - name: Enable kernel modules
+    shell: |
+      modprobe overlay
+      modprobe br_netfilter
+
+  - name: Configure IP forwarding and iptables
+    blockinfile:
+      create: true
+      path: /etc/sysctl.conf
+      block: |
+        net.bridge.bridge-nf-call-iptables = 1
+        net.ipv4.ip_forward = 1
+
+  - name: Persist changes
+    command: sysctl -p
+
+  - name: Get IP eth1 addr
+    shell: ifconfig eth1 | grep 'inet' | cut -d{{':'}} -f2 | awk '{ print $2 }'
+    register: output
+
+  - name: Configure kubelet
     lineinfile:
-      path: /etc/default/kubelet
-      line: KUBELET_EXTRA_ARGS=--node-ip={{ node_ip }}
-
-  - name: Restart kubelet
-    service:
-      name: kubelet
-      daemon_reload: yes
-      state: restarted
+      path: /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+      line: Environment="KUBELET_EXTRA_ARGS=--node-ip={{ output.stdout }}"
 
   - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="192.168.50.10"
- 
+    command: kubeadm init --apiserver-advertise-address="192.168.50.10" --apiserver-cert-extra-sans="192.168.50.10" --pod-network-cidr=172.16.0.0/16
+
+  - name: Create kube directory
+    file:
+      path: /home/vagrant/.kube
+      state: directory
+
   - name: Setup kubeconfig for vagrant user
-    command: "{{ item }}"
-    with_items:
-     - mkdir -p /home/vagrant/.kube
-     - cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
-     - chown vagrant:vagrant /home/vagrant/.kube/config
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /home/vagrant/.kube/config
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+      mode: '0644'
 
+### Test
+  - name: Create Shared kube directory
+    file:
+      path: /vagrant/configs
+      state: directory
 
-  - name: Install calico pod network
+  - name: Setup kubeconfig Outside Vagrant
+    copy:
+      src: /etc/kubernetes/admin.conf
+      dest: /vagrant/configs/config
+      remote_src: yes
+      owner: vagrant
+      group: vagrant
+      mode: '0644'
+
+  - name: Download calico.conf
+    get_url:
+      url: https://docs.projectcalico.org/v3.20/manifests/calico.yaml
+      dest: /home/vagrant/calico.yaml
+
+  - name: Add pod config to calico.yaml
+    lineinfile:
+      dest: /home/vagrant/calico.yaml
+      regexp: '^\s{12}#\s*- name: CALICO_IPV4POOL_CIDR.*$'
+      line: '            - name: CALICO_IPV4POOL_CIDR'
+
+  - name: Add pod config to calico.yaml
+    lineinfile:
+      dest: /home/vagrant/calico.yaml
+      regexp: '^\s{12}#\s*  value: "192.168.0.0\/16".*$'
+      line: '              value: "172.16.0.0/16"'
+
+  - name: Install calico CNI
     become: false
-    command: kubectl create -f https://docs.projectcalico.org/v3.4/getting-started/kubernetes/installation/hosted/calico.yaml
+    command: kubectl create -f calico.yaml
 
   - name: Generate join command
     command: kubeadm token create --print-join-command
     register: join_command
 
   - name: Copy join command to local file
+    become: false
     local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
 
+  - name: Setup Monitoring
+    become: false
+    command: kubectl create -f /vagrant/deploy/01-monitoring/manifests/setup/
 
-  handlers:
-    - name: docker status
-      service: name=docker state=started
+  - name: Deploy Monitoring
+    become: false
+    command: kubectl create -f /vagrant/deploy/01-monitoring/manifests/
+
+  - name: Deploy Kafka
+    become: false
+    command: kubectl create -f /vagrant/deploy/02-kafka/
+
+  - name: Deploy Python App
+    become: false
+    command: kubectl create -f /vagrant/deploy/03-app/

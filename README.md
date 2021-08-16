@@ -1,16 +1,52 @@
-#1) Baixa as chaves GPG da oracle:
-$ wget -q https://www.virtualbox.org/download/oracle_vbox_2016.asc -O- | sudo apt-key add -
-$ wget -q https://www.virtualbox.org/download/oracle_vbox.asc -O- | sudo apt-key add -
+# vagrant-ansible-kubernetes
+Combination of Vagrant and Ansible to spin up a Kubernetes cluster
 
-2)Adiciona o repositório do virtualbox:
-$ sudo add-apt-repository "deb [arch=amd64] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib"
+### Prerequisites
+- VirtualBox
+  - vagrant-vbguest
+- Vagrant
+- Ansible
+- kubectl (optional)
 
-3)Instala o VirtualBox:
-$ sudo apt update
-$ sudo apt install virtualbox-6.0
 
-4)Instala headers do kernel e umas bibliotecas necessárias para  compilação:
-$ sudo apt-get install build-essential linux-headers-$(uname -r) dkms virtualbox-dkms
+### Define amount of nodes
+in Vagrantfile:
+```
+N = 2
+```
 
-5) Ativa o modulo do kernel:
-$ sudo modprobe vboxdrv
+
+### Spin up cluster
+```
+$ vagrant up
+```
+
+### Verify on master
+```
+$ vagrant ssh k8s-master
+$ kubectl get nodes
+NAME         STATUS   ROLES                  AGE     VERSION
+k8s-master   Ready    control-plane,master   10m     v1.21.0
+node-1       Ready    <none>                 7m21s   v1.21.0
+node-2       Ready    <none>                 4m37s   v1.21.0
+```
+
+### Use kubectl from local Machine
+```
+$ export KUBECONFIG=configs/config
+```
+
+### Verify nodes from local Machine
+```
+$ kubectl get nodes
+NAME         STATUS   ROLES                  AGE   VERSION
+k8s-master   Ready    control-plane,master   24m   v1.21.0
+node-1       Ready    <none>                 19m   v1.21.0
+node-2       Ready    <none>                 14m   v1.21.0
+```
+
+### Grafana
+http://192.168.50.10:31000/
+user: admin
+pass: admin
+
