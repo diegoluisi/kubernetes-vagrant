@@ -1,0 +1,36 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: lab-python-consumer-svc
+spec:
+  selector:
+    app: lab-python-consumer
+  ports:
+  - protocol: "TCP"
+    port: 6000
+    targetPort: 5000
+  type: LoadBalancer
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab-python-consumer
+spec:
+  selector:
+    matchLabels:
+      app: lab-python-consumer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: lab-python-consumer
+    spec:
+      containers:
+      - name: lab-python-consumer
+        image: diegoluisi/lab-python-consumer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000
+
