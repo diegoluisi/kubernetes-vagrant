@@ -155,16 +155,20 @@
 
   - name: Setup Monitoring
     become: false
-    command: kubectl create -f /vagrant/deploy/01-monitoring/manifests/setup/
+    command: kubectl create -f /vagrant/deploy/01-monitoring/manifests/setup/ 
 
   - name: Deploy Monitoring
     become: false
-    command: kubectl create -f /vagrant/deploy/01-monitoring/manifests/
+    command: kubectl create -f /vagrant/deploy/01-monitoring/manifests/ 
 
   - name: Deploy Kafka
     become: false
-    command: kubectl create -f /vagrant/deploy/02-kafka/
+    command: kubectl create -f /vagrant/deploy/02-kafka/ 
+
+  - name: Deploy Kafka Cluster
+    become: false
+    command: kubectl create -f /vagrant/deploy/03-kafka-cluster/ 
 
   - name: Deploy Python App
     become: false
-    command: kubectl create -f /vagrant/deploy/03-app/
+    command: kubectl create -f /vagrant/deploy/04-app/
