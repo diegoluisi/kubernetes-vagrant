@@ -1,0 +1,22 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lab-python-producer
+  namespace: app
+spec:
+  selector:
+    matchLabels:
+      app: lab-python-producer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: lab-python-producer
+    spec:
+      containers:
+      - name: lab-python-producer
+        image: diegoluisi/lab-python-producer:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 5000

@@ -1,0 +1,8 @@
+apiVersion: kafka.strimzi.io/v1beta1
+kind: Kafka
+metadata:
+  name: lab-python
+  namespace: kafka        
+spec:
+  # ...
+  kafkaExporter: {}

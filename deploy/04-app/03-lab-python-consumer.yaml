@@ -1,25 +1,4 @@
 ---
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: app
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: lab-python-consumer-svc
-  namespace: app
-spec:
-  selector:
-    app: lab-python-consumer
-  ports:
-  - protocol: "TCP"
-    port: 6000
-    targetPort: 5000
-  type: LoadBalancer
-
----
 apiVersion: apps/v1
 kind: Deployment
 metadata:
