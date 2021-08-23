@@ -2,8 +2,9 @@ apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
   name: lab-python
+  namespace: kafka
 spec:
   # ...
   kafkaExporter:
-    topicRegex: "important-topic-.*"
-    groupRegex: "important-group-.*"
+    topicRegex: "input.*"
+    groupRegex: "input.*"
