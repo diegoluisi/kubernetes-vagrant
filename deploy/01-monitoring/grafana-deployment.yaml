@@ -119,9 +119,9 @@ spec:
         - mountPath: /grafana-dashboard-definitions/0/scheduler
           name: grafana-dashboard-scheduler
           readOnly: false
-        - mountPath: /etc/grafana/provisioning/dashboards/0/kafka-metrics
-          name: kafka-metrics
-          readOnly: false
+          # - mountPath: /etc/grafana/provisioning/dashboards/0/kafka-metrics
+          # - name: kafka-metrics
+          # - readOnly: false
       nodeSelector:
         beta.kubernetes.io/os: linux
       securityContext:
@@ -207,7 +207,7 @@ spec:
       - configMap:
           name: grafana-dashboard-workload-total
         name: grafana-dashboard-workload-total
-      - name: dashboard-elasticsearch-alerts
-        configMap:
-          name: kafka-metrics
-          defaultMode: 0600
+        # - name: dashboard-elasticsearch-alerts
+        # - configMap:
+        # -   name: kafka-metrics
+        # -   defaultMode: 0600
