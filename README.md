@@ -81,7 +81,7 @@ pass: admin
 
 ### Debugging
 ```code
- vagrant up 
+$ vagrant up 
 
 Bringing machine 'k8s-master' up with 'virtualbox' provider...
 Bringing machine 'node-1' up with 'virtualbox' provider...
@@ -104,3 +104,7 @@ more information including valid format see:
 # sudo vim /etc/vbox/networks.conf
 * 0.0.0.0/0 ::/0
 ```
+### Destroy de env
+````code
+$ vagrant destroy
+````
