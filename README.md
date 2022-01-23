@@ -67,10 +67,17 @@ node-1       Ready    <none>                 19m   v1.21.0
 node-2       Ready    <none>                 14m   v1.21.0
 ```
 
+### Customize
+```code
+$ vim kubernetes-setup/master-playbook.yml
+```
+
 ### Grafana
+```markdown
 http://192.168.50.10:31000/   
 user: admin   
 pass: admin
+````
 
 ### Debugging
 ```code
