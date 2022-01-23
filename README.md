@@ -68,8 +68,8 @@ node-2       Ready    <none>                 14m   v1.21.0
 ```
 
 ### Grafana
-http://192.168.50.10:31000/
-user: admin
+http://192.168.50.10:31000/   
+user: admin   
 pass: admin
 
 ### Debugging
