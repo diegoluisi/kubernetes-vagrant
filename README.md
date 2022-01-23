@@ -1,13 +1,26 @@
 # vagrant-kubernetes
-Combination of Vagrant and Ansible to spin up a Kubernetes cluster
+Combination of Vagrant and Ansible to spin up a multi node Kubernetes cluster
+
+### Objective 
+This blog post describes the steps required to setup a multi node Kubernetes cluster for development purposes. This setup provides a production-like cluster that can be setup on your local machine.
+
+### Why do we require multi node cluster setup? 
+Multi node Kubernetes clusters offer a production-like environment which has various advantages. Even though Minikube provides an excellent platform for getting started, it doesn't provide the opportunity to work with multi node clusters which can help solve problems or bugs that are related to application design and architecture. For instance, Ops can reproduce an issue in a multi node cluster environment, Testers can deploy multiple versions of an application for executing test cases and verifying changes. These benefits enable teams to resolve issues faster which make the more agile.
+
+### Why use Vagrant and Ansible?
+Vagrant is a tool that will allow us to create a virtual environment easily and it eliminates pitfalls that cause the works-on-my-machine phenomenon. It can be used with multiple providers such as Oracle VirtualBox, VMware, Docker, and so on. It allows us to create a disposable environment by making use of configuration files.
+
+Ansible is an infrastructure automation engine that automates software configuration management. It is agentless and allows us to use SSH keys for connecting to remote machines. Ansible playbooks are written in yaml and offer inventory management in simple text files.
+
+
 
 ### Prerequisites
-- Git - [How to Install](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
-- VirtualBox - [Download and Install](https://www.virtualbox.org/wiki/Linux_Downloads)
+- Git - [How to](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
+- VirtualBox - [How to](https://www.virtualbox.org/wiki/Linux_Downloads)
   - vagrant-vbguest
-- Vagrant [How to Install](https://www.vagrantup.com/downloads)
-- Ansible [How to Install](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-- kubectl (optional) [How to Install](https://github.com/ahmetb/kubectx#installation)
+- Vagrant [How to](https://www.vagrantup.com/downloads)
+- Ansible [How to](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+- kubectl (optional) [How to](https://github.com/ahmetb/kubectx#installation)
 
 ### Clone the repository
 ```code
