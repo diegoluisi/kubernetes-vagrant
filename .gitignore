@@ -1,4 +1,5 @@
 configs/
 .vagrant/
 join-command
+./kubernetes-setup/join-command
 kubernetes-setup/join-command
