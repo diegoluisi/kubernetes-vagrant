@@ -1,4 +1,4 @@
-# vagrant-kubernetes
+# kubernetes-vagrant
 Combination of Vagrant and Ansible to spin up a multi node Kubernetes cluster
 
 ### Objective 
